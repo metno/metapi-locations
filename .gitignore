@@ -1,0 +1,11 @@
+/RUNNING_PID
+/logs/
+/project/*-shim.sbt
+/project/project/
+/project/target/
+/target/
+.eclipse_build
+/.cache
+/.classpath
+/.project
+/.worksheet/
