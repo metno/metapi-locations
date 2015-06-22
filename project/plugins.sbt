@@ -1,7 +1,6 @@
-
 resolvers ++= Seq(
-	"jgit-repo" at "http://download.eclipse.org/jgit/maven",
-	"typesafe" at "http://repo.typesafe.com/typesafe/releases/"
+    "jgit-repo" at "http://download.eclipse.org/jgit/maven",
+    "typesafe" at "http://repo.typesafe.com/typesafe/releases/"
 )
 
 // Git plugin

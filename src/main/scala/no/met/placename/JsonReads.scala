@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2015 met.no
+    Copyright (C) 2014 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -32,12 +32,35 @@ import org.joda.time.DateTime
 import no.met.geojson.Geometry
 import no.met.geojson.JsonReads._
 
-
 /**
  * Defines some implicit readers to handle kartverkets geojson properties format
  */
 
 object JsonReads {
+  import org.joda.time.DateTime
+  import org.joda.time.format.DateTimeFormat
+  import org.joda.time.format.DateTimeFormatter
+
+  private def parseDate(input: String, format: DateTimeFormatter, path: JsPath): JsResult[DateTime] =
+    scala.util.control.Exception.allCatch[DateTime].opt(DateTime.parse(input, format)) match {
+      case Some(d) => JsSuccess(d)
+      case None => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.jodadate.format", format.toString()))))
+    }
+
+  private def intToDateTime(n: BigDecimal): JsResult[org.joda.time.DateTime] = {
+    val df8 = DateTimeFormat.forPattern("yyyyMMdd")
+    val df10 = DateTimeFormat.forPattern("yyyyMMddHH")
+    val df12 = DateTimeFormat.forPattern("yyyyMMddHHmm")
+    val df14 = DateTimeFormat.forPattern("yyyyMMddHHmmss")
+
+    n.toString() match {
+      case s if s.length() == 8 => parseDate( s, df8, JsPath())
+      case s if s.length() == 10 => parseDate(s, df10, JsPath())
+      case s if s.length() == 12 => parseDate(s, df12, JsPath())
+      case s if s.length() == 14 => parseDate(s, df14, JsPath())
+      case _ => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date (number encoded on the form yyyyMMdd[[[HH]mm]ss]"))))
+    }
+  }
 
   /**
    * Reads for the 'org.joda.time.DateTime' type.
@@ -57,35 +80,14 @@ object JsonReads {
    *        Useful when standards are not exactly respected and require a few tweaks
    */
   def jodaDateTimeReads(pattern: String, corrector: String => String = identity): Reads[org.joda.time.DateTime] = new Reads[org.joda.time.DateTime] {
-    import org.joda.time.DateTime
-    import org.joda.time.format.DateTimeFormat
-    import org.joda.time.format.DateTimeFormatter
-
     val dfs = DateTimeFormat.forPattern(pattern)
-    val df8 = DateTimeFormat.forPattern("yyyyMMdd")
-    val df10 = DateTimeFormat.forPattern("yyyyMMddHH")
-    val df12 = DateTimeFormat.forPattern("yyyyMMddHHmm")
-    val df14 = DateTimeFormat.forPattern("yyyyMMddHHmmss")
 
     def reads(json: JsValue): JsResult[DateTime] = json match {
-      case JsNumber(d) => d.toString().trim() match {
-        case s if s.length() == 8 => parseDate(d.toString(), df8, JsPath())
-        case s if s.length() == 10 => parseDate(d.toString(), df10, JsPath())
-        case s if s.length() == 12 => parseDate(d.toString(), df12, JsPath())
-        case s if s.length() == 14 => parseDate(d.toString(), df14, JsPath())
-        case _ => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date (number encoded on the form yyyyMMdd[[[HH]mm]ss]"))))
-      }
+      case JsNumber(d) => intToDateTime(d)
       case JsString(s) => parseDate(corrector(s), dfs, JsPath())
       case _ => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
     }
-
-    private def parseDate(input: String, format: DateTimeFormatter, path: JsPath): JsResult[DateTime] =
-      scala.util.control.Exception.allCatch[DateTime].opt(DateTime.parse(input, format)) match {
-        case Some(d) => JsSuccess(d)
-        case None => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.jodadate.format", format.toString()))))
-      }
   }
-
 
   implicit val jodaDateReads = jodaDateTimeReads("yyyy-MM-dd")
 
@@ -134,4 +136,3 @@ object JsonReads {
   implicit val placenameFeatureReads: Reads[PlacenameFeature] = placenameFeatureReader
 
 }
-

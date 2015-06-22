@@ -44,58 +44,63 @@ import scala.util.Success
 import scala.util.Failure
 import scala.util.Failure
 
-object Populate {
-  class SolrError(msg: String) extends RuntimeException(msg) {}
+class SolrError(msg: String) extends RuntimeException(msg) {}
 
-  def doPopulate(solr: SolrPlacenameFeed, file: String, dryRun: Boolean = false,
-    maxElements: Long = Long.MaxValue): Try[Long] = Try {
-    var toMannyErrorsCount = 0;
-    var lastErrorMsg = ""
-    var count: Long = 0
-    var max: Long = 0
-    val lb = ListBuffer[PlacenameFeature]()
+/**
+ * Class to populate a solr database with place data from
+ * 'kartverkets' placename database.
+ */
+private class Populate(solr: SolrPlacenameFeed, maxElements: Long = Long.MaxValue) {
+  var toMannyErrorsCount = 0;
+  var lastErrorMsg = ""
+  var count: Long = 0
+  var max: Long = 0
+  val lb = ListBuffer[PlacenameFeature]()
 
-    class MaxException extends RuntimeException {}
+  class MaxException extends RuntimeException {}
 
-    def maxProccessed: Unit = {
-      count += 1
-      max += 1
-      if (max > maxElements)
-        throw new MaxException()
+  def maxProccessed: Unit = {
+    count += 1
+    max += 1
+    if (max > maxElements) {
+      throw new MaxException()
     }
+  }
 
-    def dryrun(v: JsValue, path: String): Unit = {
-      maxProccessed
-      val place = v.validate[PlacenameFeature]
-      val js = Json.toJson(place.get)
-      println(path + s"\n${"-" * path.length()}\n" + Json.prettyPrint(js) + "\n")
+  def dryrun(v: JsValue, path: String): Unit = {
+    maxProccessed
+    val place = v.validate[PlacenameFeature]
+    val js = Json.toJson(place.get)
+    println(path + s"\n${"-" * path.length()}\n" + Json.prettyPrint(js) + "\n")
+  }
+
+  def jsParse(in: java.io.Reader, jsonPath: JsonHelper.Path, f: (JsValue, String) => Unit): Try[Unit] = {
+    JsonHelper.Parser.parse(in, jsonPath, f) recover {
+      case _: MaxException => ()
+      case e => throw e
     }
+  }
 
-    def jsParse(in: java.io.Reader, jsonPath: JsonHelper.Path, f: (JsValue, String) => Unit): Try[Unit] = {
-      JsonHelper.Parser.parse(in, jsonPath, f) recover {
-        case _: MaxException => ()
-        case e => throw e
-      }
+  def index(v: JsValue, path: String): Unit = v.validate[PlacenameFeature] match {
+    case JsSuccess(place, _) => solr.addPlacename(place) match {
+      case Failure(e) =>
+        println(s"Failed to index document(s) '$path'. Reason: ${e.getMessage}")
+        val msg = e.getMessage
+        toMannyErrorsCount += 1
+
+        if (msg == lastErrorMsg) {
+          throw new SolrError(msg)
+        } else if (toMannyErrorsCount > 10) {
+          throw new SolrError(s"To manny errors: Last error '$msg'")
+        }
+
+        lastErrorMsg = msg
+      case _ => maxProccessed
     }
+    case _ => println(s"Validation error: '$path'.[$v]")
+  }
 
-    def index(v: JsValue, path: String): Unit = v.validate[PlacenameFeature] match {
-      case JsSuccess(place, _) => solr.addPlacename(place) match {
-        case Failure(e) =>
-          println(s"Failed to index document(s) '$path'. Reason: ${e.getMessage}")
-          val msg = e.getMessage
-          toMannyErrorsCount += 1
-
-          if (msg == lastErrorMsg)
-            throw new SolrError(msg)
-          else if (toMannyErrorsCount > 10)
-            throw new SolrError(s"To manny errors: Last error '$msg'")
-
-          lastErrorMsg = msg
-        case _ => maxProccessed
-      }
-      case _ => println(s"Validation error: '$path'.[$v]")
-    }
-
+  def doPopulate(file: String, dryRun: Boolean = false): Try[Long] = Try {
     val func = if (dryRun) dryrun _ else index _
     val dataPath = JsonHelper.Path.parse("/features/@")
 
@@ -114,4 +119,16 @@ object Populate {
 
     count
   }
+}
+
+object Populate {
+  class SolrError(msg: String) extends RuntimeException(msg) {}
+
+  def doPopulate(solr: SolrPlacenameFeed, file: String, dryRun: Boolean = false,
+    maxElements: Long = Long.MaxValue): Try[Long] = {
+    val populate = new Populate(solr, maxElements)
+
+    populate.doPopulate(file, dryRun)
+  }
+
 }

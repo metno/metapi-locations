@@ -34,7 +34,7 @@ ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages := """
 libraryDependencies ++= Seq(
   "no.met" %% "metapi-util" % "0.1-SNAPSHOT",
   "joda-time" % "joda-time" % "2.7",
-  "org.slf4j" % "slf4j-log4j12" % "1.7.12", 
+  "org.slf4j" % "slf4j-log4j12" % "1.7.12",
   "commons-logging" % "commons-logging" % "1.2",
   "org.apache.solr" % "solr-solrj" % "5.1.0",
   "org.apache.solr" % "solr-test-framework" % "5.1.0" % "test",
@@ -47,7 +47,7 @@ libraryDependencies ++= Seq(
 
  //"jp.sf.amateras.solr.scala" %% "solr-scala-client" % "0.0.12",
 
-resolvers ++= Seq( 
+resolvers ++= Seq(
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
   "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository",
   "sonatype-releases" at "http://oss.sonatype.org/content/repositories/releases/",

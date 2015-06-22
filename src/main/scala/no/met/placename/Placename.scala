@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2015 met.no
+    Copyright (C) 2014 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -55,5 +55,3 @@ case class Properties(skrSnskrstat: String,
 case class PlacenameFeature( prop: Properties, geometry: Geometry)
 
 case class PlacenameFeatureCollection( features: Seq[PlacenameFeature])
-
-

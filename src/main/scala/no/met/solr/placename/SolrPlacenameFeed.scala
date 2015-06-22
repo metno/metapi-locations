@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2015 met.no
+    Copyright (C) 2014 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -47,11 +47,11 @@ import scala.util.{Failure, Success}
  * The schema is defined in src/solr_home/placenames/conf/solrconfig.xml.
  */
 
-class SolrPlacenameFeed(solr: no.met.solr.SClient, cacheDocumentsBeforeSend: Integer = 100) {
+class SolrPlacenameFeed(solr: no.met.solr.SClient, cacheDocumentsBeforeSend: Integer ) {
   private var countCache = 0
   private var count = 0
 
-  def docsSendt = count
+  def docsSendt: Int = count
   def newPlacename(place: PlacenameFeature): Try[SolrInputDocument] = Try {
     val doc: SolrInputDocument = new SolrInputDocument()
 

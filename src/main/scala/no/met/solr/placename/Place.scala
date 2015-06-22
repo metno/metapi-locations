@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2015 met.no
+    Copyright (C) 2014 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -28,4 +28,3 @@ package no.met.solr.placename
 case class Place( ssrId: Long,ssrObjId: Long,
     nameType: Int, placename: String ,language: String,
     location: String)
-

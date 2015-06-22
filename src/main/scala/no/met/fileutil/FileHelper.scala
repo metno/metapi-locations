@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2015 met.no
+    Copyright (C) 2014 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -53,12 +53,17 @@ object FileHelper {
         case Success(zip) => zipFile(zip, which)
         case Failure(e) => throw e
       }
-    } else file match {
-      case which(_*) =>
-        val p = FileSystems.getDefault().getPath(file)
-        if (Files.exists(p) && Files.isReadable(p)) ordinaryFile(p.toFile())
-        else throw new Exception(s"The file '$file' do not exist or is not a regular file.")
-      case _ => throw new Exception(s"The filename '${file.toString}' do not match the regex '$which'")
+    } else {
+      file match {
+        case which(_*) =>
+          val p = FileSystems.getDefault().getPath(file)
+          if (Files.exists(p) && Files.isReadable(p)) {
+            ordinaryFile(p.toFile())
+          } else {
+            throw new Exception(s"The file '$file' do not exist or is not a regular file.")
+          }
+        case _ => throw new Exception(s"The filename '${file.toString}' do not match the regex '$which'")
+      }
     }
   }
 }

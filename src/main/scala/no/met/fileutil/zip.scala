@@ -39,7 +39,7 @@ class Zip(val zipFile: Path) {
   val zip = new ZipFile(zipFile.toFile)
 
   def getEntries(which: Regex): Seq[ZipEntry] = {
-    def useThis(file: String) = file match {
+    def useThis(file: String): Boolean = file match {
       case which(_*) => true
       case _ => false
     }

@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2015 met.no
+    Copyright (C) 2014 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -37,7 +37,7 @@ import play.api.data.validation.ValidationError
 object JsonWrites {
 
   implicit val pointWrite: Writes[Point] = new Writes[Point] {
-    def writes(point: Point) = {
+    def writes(point: Point):JsValue = {
       point.altitude match {
         case Some(a) => Json.toJson(Seq(point.longitude, point.latitude, a))
         case _ => Json.toJson(Seq(point.longitude, point.latitude))
@@ -46,11 +46,11 @@ object JsonWrites {
   }
 
   implicit val geometryWrite: Writes[Geometry] = new Writes[Geometry] {
-    def writes(g: Geometry) = g.geom match {
+    def writes(g: Geometry): JsValue = g.geom match {
       case p: Point =>
         Json.obj("type" -> "Point",
           "coordinates" -> p)
-      case gt => JsUndefined("Invalid or unimplmented geometry type '" + gt.toString()+"'.")
+      case gt => JsUndefined("Invalid or unimplmented geometry type '" + gt.toString() + "'.")
     }
   }
 }

@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2015 met.no
+    Copyright (C) 2014 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -53,7 +53,7 @@ object JsonWrites {
   implicit val jodaDateWrites = jodaDateTimeWrites()
 
   implicit val propertiesWrites: Writes[Properties] = new Writes[Properties] {
-    def writes(prop: Properties) = Json.obj(
+    def writes(prop: Properties): JsValue = Json.obj(
       "skr_snskrstat" -> prop.skrSnskrstat,
       "enh_ssr_id" -> prop.enhSsrId,
       "for_kartid" -> prop.forKartId,
@@ -75,7 +75,7 @@ object JsonWrites {
 
   implicit val placenameFeatureWrites: Writes[PlacenameFeature] =
     new Writes[PlacenameFeature] {
-      def writes(pn: PlacenameFeature) = Json.obj(
+      def writes(pn: PlacenameFeature): JsValue = Json.obj(
         "type" -> "Feature",
         "properties" -> pn.prop,
         "geometry" -> pn.geometry)
@@ -83,9 +83,8 @@ object JsonWrites {
 
   implicit val featureCollectionWrites: Writes[PlacenameFeatureCollection] =
     new Writes[PlacenameFeatureCollection] {
-      def writes(fc: PlacenameFeatureCollection ) = Json.obj(
+      def writes(fc: PlacenameFeatureCollection ): JsValue = Json.obj(
         "type" -> "FeatureCollection",
         "features" -> fc.features )
     }
 }
-
