@@ -2,11 +2,11 @@ name := """metapi-solr-placenames"""
 
 version := "0.1-SNAPSHOT"
 
-organization := "no.met"
+organization := "no.met.data"
 
 licenses += "GPLv2" -> url("https://www.gnu.org/licenses/gpl-2.0.html")
 
-description := "Load norwegians placenames into a solr database."
+description := "Helper classes to load norwegians placenames into a solr database."
 
 publishTo := {
   val nexus = "http://maven.met.no/"
@@ -49,12 +49,10 @@ libraryDependencies ++= Seq(
 
 resolvers ++= Seq(
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
-  "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository",
   "sonatype-releases" at "http://oss.sonatype.org/content/repositories/releases/",
-  "sonatype-central" at "https://repo1.maven.org/maven2"
+  "sonatype-central" at "https://repo1.maven.org/maven2",
+  "metno repo" at "http://maven.met.no/content/groups/public"
 )
-
-//"metno repo" at "http://maven.met.no/content/groups/public"
 
 parallelExecution in Test := false
 

@@ -9,3 +9,8 @@
 /.classpath
 /.project
 /.worksheet/
+/bin
+/lib
+*~
+/.idea
+/.idea_modules
