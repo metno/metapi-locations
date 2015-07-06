@@ -23,7 +23,7 @@
     MA 02110-1301, USA
 */
 
-package no.met.placename
+package no.met.location
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -110,8 +110,8 @@ object JsonReads {
     (JsPath \ "kom_fylkesnr").read[Int] and
     (JsPath \ "kpr_tekst").read[String])(Properties.apply _)
 
-  def placenameFeatureReader: Reads[PlacenameFeature] = new Reads[PlacenameFeature] {
-    def reads(json: JsValue): JsResult[PlacenameFeature] = {
+  def locationFeatureReader: Reads[LocationFeature] = new Reads[LocationFeature] {
+    def reads(json: JsValue): JsResult[LocationFeature] = {
       (json \ "type").validate[String] match {
         case t: JsSuccess[String] => t.get.toLowerCase() match {
           case "feature" => parse(json)
@@ -121,18 +121,18 @@ object JsonReads {
       }
     }
 
-    private def parse(js: JsValue): JsResult[PlacenameFeature] = {
+    private def parse(js: JsValue): JsResult[LocationFeature] = {
       val prop = (js \ "properties").validate[Properties]
       val geom = (js \ "geometry").validate[Geometry]
       (prop, geom) match {
-        case (JsSuccess(p, _), JsSuccess(g, _)) => JsSuccess(PlacenameFeature(p, g))
+        case (JsSuccess(p, _), JsSuccess(g, _)) => JsSuccess(LocationFeature(p, g))
         case (e: JsError, _) => e
         case (_, e: JsError) => e
-        case _ => JsError("PlacenameFeature, Uknown parseerror.")
+        case _ => JsError("LocationFeature, Uknown parseerror.")
       }
     }
   }
 
-  implicit val placenameFeatureReads: Reads[PlacenameFeature] = placenameFeatureReader
+  implicit val locationFeatureReads: Reads[LocationFeature] = locationFeatureReader
 
 }

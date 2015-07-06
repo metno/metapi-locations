@@ -23,13 +23,13 @@
     MA 02110-1301, USA
 */
 
-package no.met.placename
+package no.met.location
 import no.met.geojson._
 import org.joda.time.DateTime
 
 
 /**
- * Helper classes to decode kartverktes placename database
+ * Helper classes to decode kartverktes location database
  * in geojson format.
  */
 
@@ -52,6 +52,6 @@ case class Properties(skrSnskrstat: String,
                       kprTekst: String )
 
 
-case class PlacenameFeature( prop: Properties, geometry: Geometry)
+case class LocationFeature( prop: Properties, geometry: Geometry)
 
-case class PlacenameFeatureCollection( features: Seq[PlacenameFeature])
+case class LocationFeatureCollection( features: Seq[LocationFeature])

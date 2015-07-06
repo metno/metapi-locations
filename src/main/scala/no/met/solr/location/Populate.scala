@@ -23,16 +23,16 @@
     MA 02110-1301, USA
 */
 
-package no.met.solr.placename
+package no.met.solr.location
 
 import java.io.{ File, Reader, FileReader }
 import scala.util.{ Try, Failure, Success }
 import play.api.libs.json._
 import no.met.fileutil._
 import no.met.fileutil.FileHelper.fileIter
-import no.met.placename._
-import no.met.placename.JsonWrites._
-import no.met.placename.JsonReads._
+import no.met.location._
+import no.met.location.JsonWrites._
+import no.met.location.JsonReads._
 import java.nio.file.FileSystems
 import scala.collection.mutable.ListBuffer
 import scala.util.Failure
@@ -47,15 +47,15 @@ import scala.util.Failure
 class SolrError(msg: String) extends RuntimeException(msg) {}
 
 /**
- * Class to populate a solr database with place data from
- * 'kartverkets' placename database.
+ * Class to populate a solr database with location data from
+ * 'kartverkets' location database.
  */
-private class Populate(solr: SolrPlacenameFeed, maxElements: Long = Long.MaxValue) {
+private class Populate(solr: SolrLocationFeed, maxElements: Long = Long.MaxValue) {
   var toMannyErrorsCount = 0;
   var lastErrorMsg = ""
   var count: Long = 0
   var max: Long = 0
-  val lb = ListBuffer[PlacenameFeature]()
+  val lb = ListBuffer[LocationFeature]()
 
   class MaxException extends RuntimeException {}
 
@@ -69,7 +69,7 @@ private class Populate(solr: SolrPlacenameFeed, maxElements: Long = Long.MaxValu
 
   def dryrun(v: JsValue, path: String): Unit = {
     maxProccessed
-    val place = v.validate[PlacenameFeature]
+    val place = v.validate[LocationFeature]
     val js = Json.toJson(place.get)
     println(path + s"\n${"-" * path.length()}\n" + Json.prettyPrint(js) + "\n")
   }
@@ -81,8 +81,8 @@ private class Populate(solr: SolrPlacenameFeed, maxElements: Long = Long.MaxValu
     }
   }
 
-  def index(v: JsValue, path: String): Unit = v.validate[PlacenameFeature] match {
-    case JsSuccess(place, _) => solr.addPlacename(place) match {
+  def index(v: JsValue, path: String): Unit = v.validate[LocationFeature] match {
+    case JsSuccess(place, _) => solr.addLocation(place) match {
       case Failure(e) =>
         println(s"Failed to index document(s) '$path'. Reason: ${e.getMessage}")
         val msg = e.getMessage
@@ -124,7 +124,7 @@ private class Populate(solr: SolrPlacenameFeed, maxElements: Long = Long.MaxValu
 object Populate {
   class SolrError(msg: String) extends RuntimeException(msg) {}
 
-  def doPopulate(solr: SolrPlacenameFeed, file: String, dryRun: Boolean = false,
+  def doPopulate(solr: SolrLocationFeed, file: String, dryRun: Boolean = false,
     maxElements: Long = Long.MaxValue): Try[Long] = {
     val populate = new Populate(solr, maxElements)
 

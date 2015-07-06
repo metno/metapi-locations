@@ -28,7 +28,7 @@
  * parser in the future. The future has jet to come :-)
  *
  * At the moment it is just enough to support the decoding
- * of "kartverkets stedsnavn (placenames)" database.
+ * of "kartverkets stedsnavn (locations)" database.
  */
 
 package no.met.geojson

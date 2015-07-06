@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<schema name="placenames" version="1.5">
+<schema name="locations" version="1.5">
     <types>
         <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
         <fieldType name="float" class="solr.TrieFloatField" precisionStep="0" positionIncrementGap="0"/>
@@ -12,7 +12,7 @@
                 <filter class="solr.LowerCaseFilterFactory" />
             </analyzer>
         </fieldType>
-        <fieldType name="location" class="solr.SpatialRecursivePrefixTreeFieldType"
+        <fieldType name="geometry" class="solr.SpatialRecursivePrefixTreeFieldType"
             spatialContextFactory="com.spatial4j.core.context.jts.JtsSpatialContextFactory"
             geo="true"
             autoIndex="true"
@@ -26,13 +26,13 @@
         <field name="ssrObjId" type="long" indexed="true" stored="true" required="true" />
         <field name="name_type" type="long" indexed="true" stored="true" required="false" />
         <field name="name_type_str" type="string" indexed="false" stored="true" required="false" />
-        <field name="placename" type="string" indexed="false" stored="true" required="true" />
-        <field name="placename_search" type="text" indexed="true" stored="false" required="true" />
+        <field name="location" type="string" indexed="false" stored="true" required="true" />
+        <field name="location_search" type="text" indexed="true" stored="false" required="true" />
         <field name="language" type="string" indexed="true" stored="true" required="true" />
-        <field name="location" type="location" indexed="true" stored="true" required="true" />
+        <field name="geometry" type="geometry" indexed="true" stored="true" required="true" />
         <field name="jsonObj" type="string" indexed="false" stored="true" required="false" />
 
-        <copyField source="placename" dest="placename_search" />
+        <copyField source="location" dest="location_search" />
     </fields>
     <uniqueKey>ssrId</uniqueKey>
 </schema>

@@ -23,7 +23,7 @@
     MA 02110-1301, USA
 */
 
-package no.met.solr.placename
+package no.met.solr.location
 
 import org.apache.solr.client.solrj.SolrClient
 import org.apache.solr.client.solrj.impl.{ HttpSolrClient, CloudSolrClient }
@@ -35,32 +35,32 @@ import play.api.libs.json.Json
 import play.api.libs.functional.syntax._
 import java.nio.file._
 import no.met.json._
-import no.met.placename._
-import no.met.placename.JsonWrites._
+import no.met.location._
+import no.met.location.JsonWrites._
 import org.apache.solr.client.solrj.response.UpdateResponse
 import scala.util.{Failure, Success}
 
 /**
- * Class to populate a Solr database with kartverkets placenames database that
+ * Class to populate a Solr database with kartverkets location database that
  * is distributed in geojson format.
  *
- * The schema is defined in src/solr_home/placenames/conf/solrconfig.xml.
+ * The schema is defined in src/solr_home/location/conf/solrconfig.xml.
  */
 
-class SolrPlacenameFeed(solr: no.met.solr.SClient, cacheDocumentsBeforeSend: Integer ) {
+class SolrLocationFeed(solr: no.met.solr.SClient, cacheDocumentsBeforeSend: Integer ) {
   private var countCache = 0
   private var count = 0
 
   def docsSendt: Int = count
-  def newPlacename(place: PlacenameFeature): Try[SolrInputDocument] = Try {
+  def newLocation(place: LocationFeature): Try[SolrInputDocument] = Try {
     val doc: SolrInputDocument = new SolrInputDocument()
 
     doc.setField("ssrId", place.prop.enhSsrId)
     doc.setField("ssrObjId", place.prop.enhSsrObjId)
     doc.setField("name_type", place.prop.enhNavntype)
-    doc.setField("placename", place.prop.enhSnavn)
+    doc.setField("location", place.prop.enhSnavn)
     doc.setField("language", place.prop.enhSnspraak)
-    doc.setField("location", place.geometry.geom.asWkt)
+    doc.setField("geometry", place.geometry.geom.asWkt)
     doc.setField("jsonObj", Json.toJson(place))
     doc
   }
@@ -79,6 +79,6 @@ class SolrPlacenameFeed(solr: no.met.solr.SClient, cacheDocumentsBeforeSend: Int
     countCache += 1
   }
 
-  def addPlacename(place: PlacenameFeature): Try[Unit] =
-    newPlacename(place).flatMap(addDocument(_)).flatMap(_ => commitDocuments())
+  def addLocation(location: LocationFeature): Try[Unit] =
+    newLocation(location).flatMap(addDocument(_)).flatMap(_ => commitDocuments())
 }

@@ -4,7 +4,7 @@
 /project/project/
 /project/target/
 /target/
-.eclipse_build
+/.eclipse_build
 /.cache
 /.classpath
 /.project
@@ -14,3 +14,6 @@
 *~
 /.idea
 /.idea_modules
+/.settings
+/.cache-main
+/.cache-tests

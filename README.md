@@ -1,3 +1,3 @@
-# metapi-solr-placenames
+# metapi-solr-locations
 
-The solr core for the placenames data storage of the MET API.
+The solr core for the location data storage of the MET API.

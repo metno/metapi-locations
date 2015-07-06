@@ -29,14 +29,14 @@ import org.specs2.runner._
 import org.junit.runner._
 import no.met.json._
 import no.met.geojson.JsonReads._
-import no.met.placename
-import no.met.placename.JsonReads._
+import no.met.location
+import no.met.location.JsonReads._
 import org.joda.time.DateTime
 import play.api.libs.json._
 import org.junit.runner.RunWith
 
 @RunWith(classOf[JUnitRunner])
-class PlacenameSpec extends mutable.Specification {
+class LocationSpec extends mutable.Specification {
 
   def dateTime(dt: String): DateTime = new DateTime(dt)
 
@@ -85,7 +85,7 @@ class PlacenameSpec extends mutable.Specification {
       dt must beSome.which(_ == dateTime("2015-04-15T05:02:10"))
     }
 
-    "parse 'placename' properites" in {
+    "parse 'location' properites" in {
       val js = Json.parse(
         """{
               "properties": { "skr_snskrstat":"G",
@@ -108,11 +108,11 @@ class PlacenameSpec extends mutable.Specification {
                             }
            }""")
 
-      val prop = (js \ "properties").validate[placename.Properties].asOpt
+      val prop = (js \ "properties").validate[location.Properties].asOpt
 
       prop must beSome.which { p =>
         p match {
-          case p: placename.Properties =>
+          case p: location.Properties =>
             p.skrSnskrstat == "G" &&
               p.enhSsrId == 1619 &&
               p.forKartId == "1411-2" &&
@@ -135,7 +135,7 @@ class PlacenameSpec extends mutable.Specification {
       }
     }
 
-    "parse 'placename' PlacenameFeature" in {
+    "parse 'location' LocationFeature" in {
       val js = Json.parse(
         """{
             "type":"Feature",
@@ -162,12 +162,12 @@ class PlacenameSpec extends mutable.Specification {
                          }
            }""")
 
-      val place = js.validate[placename.PlacenameFeature].asOpt
+      val loc = js.validate[location.LocationFeature].asOpt
 
-      place must beSome.which { p =>
+      loc must beSome.which { p =>
         p match {
-          case p: placename.PlacenameFeature =>
-            p.prop.isInstanceOf[placename.Properties] &&
+          case p: location.LocationFeature =>
+            p.prop.isInstanceOf[location.Properties] &&
               p.geometry.isInstanceOf[Geometry]
           case _ => false
         }

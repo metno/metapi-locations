@@ -23,7 +23,7 @@
     MA 02110-1301, USA
 */
 
-package no.met.placename
+package no.met.location
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -73,17 +73,17 @@ object JsonWrites {
       "kpr_tekst" -> prop.kprTekst)
   }
 
-  implicit val placenameFeatureWrites: Writes[PlacenameFeature] =
-    new Writes[PlacenameFeature] {
-      def writes(pn: PlacenameFeature): JsValue = Json.obj(
+  implicit val locationFeatureWrites: Writes[LocationFeature] =
+    new Writes[LocationFeature] {
+      def writes(pn: LocationFeature): JsValue = Json.obj(
         "type" -> "Feature",
         "properties" -> pn.prop,
         "geometry" -> pn.geometry)
     }
 
-  implicit val featureCollectionWrites: Writes[PlacenameFeatureCollection] =
-    new Writes[PlacenameFeatureCollection] {
-      def writes(fc: PlacenameFeatureCollection ): JsValue = Json.obj(
+  implicit val featureCollectionWrites: Writes[LocationFeatureCollection] =
+    new Writes[LocationFeatureCollection] {
+      def writes(fc: LocationFeatureCollection ): JsValue = Json.obj(
         "type" -> "FeatureCollection",
         "features" -> fc.features )
     }

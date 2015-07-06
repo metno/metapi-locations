@@ -23,8 +23,8 @@
     MA 02110-1301, USA
 */
 
-package no.met.solr.placename
+package no.met.solr.location
 
-case class Place( ssrId: Long,ssrObjId: Long,
-    nameType: Int, placename: String ,language: String,
-    location: String)
+case class Location( ssrId: Long,ssrObjId: Long,
+    nameType: Int, location: String ,language: String,
+    geometryAsWkt: String)
