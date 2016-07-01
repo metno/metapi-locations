@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2014 met.no
+    Copyright (C) 2016 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -23,21 +23,17 @@
     MA 02110-1301, USA
 */
 
-package no.met.solr
-
-import org.apache.solr.client.solrj.SolrClient
-import org.apache.solr.client.solrj.impl.{ HttpSolrClient, CloudSolrClient }
+package models
 
 /**
- * Helper classes to access solr as standalone server or solr cloud.
+ * Representation of a MET API Location.
  */
+case class Location(
+    name: String,
+    geo: String
+)
 
-class SClient(val client: SolrClient, val collection: String)
-
-case class Solr(val url: String, override val collection: String)
-  extends SClient(new HttpSolrClient(url), collection)
-
-case class SolrCloud(val zookeepers: String, override val collection: String)
-  extends SClient(new CloudSolrClient(zookeepers), collection) {
-  client.asInstanceOf[CloudSolrClient].setIdField("ssrId")
-}
+/**
+ * Complete response data set to send to clients
+ */
+case class ResponseData(header: no.met.data.BasicResponseData, data: Traversable[Location])

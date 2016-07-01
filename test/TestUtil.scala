@@ -22,9 +22,25 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
     MA 02110-1301, USA
 */
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.inject.bind
+import play.api.Application
+import play.api.test.FakeApplication
+import controllers._
+import services._
+import modules.elements._
 
-package no.met.solr.location
+object TestUtil {
 
-case class Location( ssrId: Long,ssrObjId: Long,
-    nameType: Int, location: String ,language: String,
-    geometryAsWkt: String)
+  private def defaultConfig = {
+    Map(("play.http.router" -> "elements.Routes"),
+        ("play.application.loader" -> "modules.ElementsApplicationLoader"),
+        ("auth.active" -> "false"))
+  }
+
+  def app : Application = new GuiceApplicationBuilder()
+    .configure(defaultConfig)
+    .bindings(new ElementsDevModule)
+    .build
+
+}

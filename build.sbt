@@ -1,59 +1,80 @@
-name := """locations"""
-
-version := "0.1-SNAPSHOT"
-
 organization := "no.met.data"
+name := """locations"""
+version := "0.2-SNAPSHOT"
+description := "Locations module of the metapi. Translates location ids to the appropriate codes in the database."
+homepage :=  Some(url(s"https://github.com/metno"))
+licenses += "GPL-2.0" -> url("https://www.gnu.org/licenses/gpl-2.0.html")
 
-licenses += "GPLv2" -> url("https://www.gnu.org/licenses/gpl-2.0.html")
+// Scala settings
+// ----------------------------------------------------------------------
+scalaVersion := "2.11.8"
+scalacOptions ++= Seq("-deprecation", "-feature")
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-description := "Helper classes to load norwegians locations into a solr database."
+// Play settings
+// ----------------------------------------------------------------------
+PlayKeys.devSettings += ("play.http.router", "locations.Routes")
 
-publishTo := {
-  val nexus = "http://maven.met.no/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-}
-
-credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
-
-
-scalaVersion := "2.11.6"
-
-ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting := true
-
-ScoverageSbtPlugin.ScoverageKeys.coverageMinimum := 95
-
-ScoverageSbtPlugin.ScoverageKeys.coverageFailOnMinimum := false
-
-ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages := """
-    <empty>;
-"""
-
-EclipseKeys.eclipseOutput := Some(".eclipse_build")
-
+// Dependencies
+// ----------------------------------------------------------------------
 libraryDependencies ++= Seq(
-  "no.met" %% "metapi-util" % "0.1-SNAPSHOT",
-  "joda-time" % "joda-time" % "2.7",
-  "org.slf4j" % "slf4j-log4j12" % "1.7.12",
-  "commons-logging" % "commons-logging" % "1.2",
-  "org.apache.solr" % "solr-solrj" % "5.2.0",
-  "org.apache.solr" % "solr-test-framework" % "5.2.0" % "test",
-  "org.apache.solr" % "solr-core" % "5.2.0",
-  "org.specs2" %% "specs2-core" % "3.6.1" % "test",
-  "org.specs2" %% "specs2-junit" % "3.6.1" % "test",
-  "junit" % "junit" % "4.12" % "test"
+  jdbc,
+  cache,
+  evolutions,
+  ws,
+ "com.typesafe.play" %% "anorm" % "2.4.0",
+ "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
+ "com.github.nscala-time" %% "nscala-time" % "2.0.0",
+ "pl.matisoft" %% "swagger-play24" % "1.4",
+ "no.met.data" %% "util" % "0.2-SNAPSHOT",
+ "no.met.data" %% "auth" % "0.2-SNAPSHOT",
+  specs2 % Test
 )
 
 resolvers ++= Seq(
+  "OJO Artifactory" at "http://oss.jfrog.org/artifactory/oss-snapshot-local",
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
-  "sonatype-releases" at "http://oss.sonatype.org/content/repositories/releases/",
-  "sonatype-central" at "https://repo1.maven.org/maven2",
-  "restlet" at "http://maven.restlet.com",
-  "metno repo" at "http://maven.met.no/content/groups/public"
+  "amateras-repo" at "http://amateras.sourceforge.jp/mvn/"
 )
 
-parallelExecution in Test := false
+// Publish Settings
+// ----------------------------------------------------------------------
+publishTo := {
+  val jfrog = "https://oss.jfrog.org/artifactory/"
+  if (isSnapshot.value)
+    Some("Artifactory Realm" at jfrog + "oss-snapshot-local;build.timestamp=" + new java.util.Date().getTime)
+  else
+    Some("Artifactory Realm" at jfrog + "oss-release-local")
+}
+pomExtra := (
+  <scm>
+    <url>https://github.com/metno/metapi-{name.value}.git</url>
+    <connection>scm:git:git@github.com:metno/metapi-{name.value}.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>metno</id>
+      <name>Meteorological Institute, Norway</name>
+      <url>http://www.github.com/metno</url>
+    </developer>
+  </developers>)
+bintrayReleaseOnPublish := false
+publishArtifact in Test := false
 
-scalacOptions in Test ++= Seq("-Yrangepos")
+// Testing
+// ----------------------------------------------------------------------
+javaOptions += "-Djunit.outdir=target/test-report"
+coverageHighlighting := true
+coverageMinimum := 95
+coverageFailOnMinimum := true
+coverageExcludedPackages := """
+  <empty>;
+  value.ApiResponse;
+  ReverseApplication;
+  ReverseAssets;
+  elements.Routes;
+"""
+
+// Play provides two styles of routers, one expects its actions to be injected, the
+// other, legacy style, accesses its actions statically.
+routesGenerator := InjectedRoutesGenerator

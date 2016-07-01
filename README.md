@@ -1,3 +1,4 @@
-# metapi-solr-locations
+Elements access service for MET API
+=======================================
 
-The solr core for the location data storage of the MET API.
+This module implements a service for reading metadata about locations.

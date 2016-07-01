@@ -3,7 +3,8 @@
     "(^public/swagger.*/)",
     "(^legacy/)",
     "(\\.project$)",
-    "(\\.phutil_module_cache$)"
+    "(\\.phutil_module_cache$)",
+    "(^test/resources.*/)"
   ],
   "linters": {
     "chmod": {
@@ -37,7 +38,7 @@
       "type": "text",
       "severity": {
         "3": "disabled",
-        "5": "disabled"
+        "5": "advice"
       }
     }
   }

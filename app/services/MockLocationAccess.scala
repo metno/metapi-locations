@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2014 met.no
+    Copyright (C) 2016 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -23,34 +23,41 @@
     MA 02110-1301, USA
 */
 
-package no.met.geojson
+package services
 
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
-import scala.tools.cmd.Opt.Implicit
-import play.api.data.validation.ValidationError
+import javax.inject.Singleton
+import models.Location
+import play.Logger
 
-/**
- * Defines some implicit writers to handle geojson types
- */
+@Singleton
+class MockLocationAccess extends LocationAccess("") {
+  // Mock Locations
+  val locations = List[Location](
+    new Location(
+      "Moen",
+      "POINT(8.118306 58.221361)"),
+    new Location(
+      "Ulsvannet",
+      "POINT(8.207000 58.224531)")
+  )
 
-object JsonWrites {
+  def getLocations(name: Option[String]): List[Location] = {
 
-  implicit val pointWrite: Writes[Point] = new Writes[Point] {
-    def writes(point: Point):JsValue = {
-      point.altitude match {
-        case Some(a) => Json.toJson(Seq(point.longitude, point.latitude, a))
-        case _ => Json.toJson(Seq(point.longitude, point.latitude))
-      }
+    val nameList : Array[String] = name match {
+      case Some(name) => name.toLowerCase.split(",")
+      case _ => Array[String]()
     }
+
+    if (name.isDefined) {
+      locations filter (loc => nameList.contains(loc.name.toLowerCase) || nameList.length == 0)
+    }
+    else {
+      locations
+    }
+
   }
 
-  implicit val geometryWrite: Writes[Geometry] = new Writes[Geometry] {
-    def writes(g: Geometry): JsValue = g.geom match {
-      case p: Point =>
-        Json.obj("type" -> "Point",
-          "coordinates" -> p)
-      case gt => JsUndefined("Invalid or unimplmented geometry type '" + gt.toString() + "'.")
-    }
-  }
+
+
+
 }

@@ -1,7 +1,7 @@
 /*
     MET-API
 
-    Copyright (C) 2014 met.no
+    Copyright (C) 2016 met.no
     Contact information:
     Norwegian Meteorological Institute
     Box 43 Blindern
@@ -23,32 +23,16 @@
     MA 02110-1301, USA
 */
 
-/**
- * This is a start of something that can evolve to a geojson
- * parser in the future. The future has jet to come :-)
- *
- * At the moment it is just enough to support the decoding
- * of "kartverkets stedsnavn (locations)" database.
- */
+package services
 
-package no.met.geojson
+import play.api._
+import models.Location
 
 /**
- * Basetype for all geometries
+ * Abstract class for LocationAccess injection
  */
-sealed trait GeomType {
-  /**
-   * Return the geometry as an WKT string. ex POINT( 9 62 )
-   */
-  def asWkt:String
+abstract class LocationAccess(val url: String) {
+
+  def getLocations(name: Option[String]) : List[Location]
+
 }
-
-case class Point( longitude: Double, latitude: Double, altitude: Option[Double] = None ) extends GeomType {
-  def asWkt:String = "POINT( " + longitude + " " + latitude + " )"
-  override def toString():String = asWkt
-}
-
-/**
- * Helper class to decode geojson, geometry.
- */
-case class Geometry( geom: GeomType )

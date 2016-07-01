@@ -1,5 +1,5 @@
 {
-    "project.name" : "metapi-solr-placenames",
+    "project.name" : "metapi-locations",
     "phabricator.uri": "https://phab.met.no",
-    "unit.engine": "SBTTestEngine"
+    "unit.engine": "PlayTestEngine"
 }
