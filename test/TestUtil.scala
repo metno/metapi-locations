@@ -28,19 +28,19 @@ import play.api.Application
 import play.api.test.FakeApplication
 import controllers._
 import services._
-import modules.elements._
+import modules.locations._
 
 object TestUtil {
 
   private def defaultConfig = {
-    Map(("play.http.router" -> "elements.Routes"),
-        ("play.application.loader" -> "modules.ElementsApplicationLoader"),
+    Map(("play.http.router" -> "locations.Routes"),
+        ("play.application.loader" -> "modules.LocationsApplicationLoader"),
         ("auth.active" -> "false"))
   }
 
   def app : Application = new GuiceApplicationBuilder()
     .configure(defaultConfig)
-    .bindings(new ElementsDevModule)
+    .bindings(new LocationsDevModule)
     .build
 
 }
