@@ -35,7 +35,7 @@ import javax.ws.rs.{ QueryParam, PathParam }
 import com.github.nscala_time.time.Imports._
 import com.wordnik.swagger.annotations._
 import models.Location
-import services.{ LocationAccess, JsonFormat }
+import no.met.locations.{ LocationAccess, JsonFormat }
 
 // scalastyle:off magic.number
 

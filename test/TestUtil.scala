@@ -27,7 +27,7 @@ import play.api.inject.bind
 import play.api.Application
 import play.api.test.FakeApplication
 import controllers._
-import services._
+import no.met.locations._
 import modules.locations._
 
 object TestUtil {

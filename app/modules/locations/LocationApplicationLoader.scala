@@ -27,12 +27,9 @@ package modules.locations
 import play.api._
 import play.api.inject.guice._
 import com.google.inject.AbstractModule
-import services._
+import no.met.locations._
 import play.api.inject.guice.GuiceableModule.fromGuiceModule
 import play.api.inject.guice._
-import services.LocationAccess
-import services.DbLocationAccess
-import services.MockLocationAccess
 
 /**
  * Configurations for Production Mode
