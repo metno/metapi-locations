@@ -29,7 +29,7 @@ import play.api.mvc
 import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json._
-import no.met.locations._
+import services.locations._
 
 import scala.concurrent.Future
 

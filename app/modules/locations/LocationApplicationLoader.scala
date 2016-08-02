@@ -26,10 +26,10 @@ package modules.locations
 
 import play.api._
 import play.api.inject.guice._
-import com.google.inject.AbstractModule
-import no.met.locations._
 import play.api.inject.guice.GuiceableModule.fromGuiceModule
 import play.api.inject.guice._
+import com.google.inject.AbstractModule
+import services.locations._
 
 /**
  * Configurations for Production Mode

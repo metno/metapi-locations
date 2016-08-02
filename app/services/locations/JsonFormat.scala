@@ -23,7 +23,7 @@
     MA 02110-1301, USA
 */
 
-package no.met.locations
+package services.locations
 
 import play.api.mvc._
 import play.api.libs.json._

@@ -23,7 +23,7 @@
     MA 02110-1301, USA
 */
 
-package no.met.locations
+package services.locations
 
 import scala.language.postfixOps
 import play.api.Play.current
