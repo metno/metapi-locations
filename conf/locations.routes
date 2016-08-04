@@ -4,5 +4,3 @@
 
 # MET API
 GET     /v0.:format                 controllers.LocationsController.getLocations(name: Option[String], format: String)
-
-GET     /api-docs                   pl.matisoft.swagger.ApiHelpController.getResource(path = "/locations")
