@@ -41,7 +41,7 @@ class DbLocationAccess extends LocationAccess("") {
 
   val parser: RowParser[Location] = {
     get[String]("name") ~
-    get[String]("geo") map {
+    get[Option[String]]("geo") map {
       case name~geo => Location(name, geo)
     }
   }

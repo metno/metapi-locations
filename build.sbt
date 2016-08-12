@@ -62,7 +62,6 @@ publishArtifact in Test := false
 
 // Testing
 // ----------------------------------------------------------------------
-javaOptions += "-Djunit.outdir=target/test-report"
 coverageHighlighting := true
 coverageMinimum := 95
 coverageFailOnMinimum := true
@@ -71,7 +70,8 @@ coverageExcludedPackages := """
   value.ApiResponse;
   ReverseApplication;
   ReverseAssets;
-  elements.Routes;
+  locations.Routes;
+  locations.RoutesPrefix;
 """
 
 // Play provides two styles of routers, one expects its actions to be injected, the

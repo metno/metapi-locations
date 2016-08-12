@@ -35,10 +35,16 @@ class MockLocationAccess extends LocationAccess("") {
   val locations = List[Location](
     new Location(
       "Moen",
-      "POINT(8.118306 58.221361)"),
+      Some("POINT(8.118306 58.221361)")),
     new Location(
       "Ulsvannet",
-      "POINT(8.207000 58.224531)")
+      Some("POINT(8.207000 58.224531)")),
+    new Location(
+      "EmptyPoint",
+      Some("")),
+    new Location(
+      "MissingPoint",
+      None)
   )
 
   def getLocations(name: Option[String]): List[Location] = {

@@ -50,7 +50,7 @@ class ControllersSpec extends Specification {
       status(response) must equalTo(OK)
 
       val json = Json.parse(contentAsString(response))
-      (json \ "data").as[JsArray].value.size must equalTo(2)
+      (json \ "data").as[JsArray].value.size must equalTo(4)
     }
 
     "return a result with a name in the route" in new WithApplication(TestUtil.app) {
@@ -91,6 +91,27 @@ class ControllersSpec extends Specification {
       status(response) must equalTo(BAD_REQUEST)
     }
 
+    "return a result with empty point data" in new WithApplication(TestUtil.app) {
+      val response = route(FakeRequest(GET, "/v0.jsonld?name=EmptyPoint")).get
+
+      status(response) must equalTo(OK)
+
+      val json = Json.parse(contentAsString(response))
+      contentType(response) must beSome.which(_ == "application/vnd.no.met.data.locations-v0+json")
+      (json \ "data").as[JsArray].value.size must equalTo(1)
+    }
+
+    "return a result with missing point data" in new WithApplication(TestUtil.app) {
+      val response = route(FakeRequest(GET, "/v0.jsonld?name=MissingPoint")).get
+
+      status(response) must equalTo(OK)
+
+      val json = Json.parse(contentAsString(response))
+      contentType(response) must beSome.which(_ == "application/vnd.no.met.data.locations-v0+json")
+      (json \ "data").as[JsArray].value.size must equalTo(1)
+    }
+
+    
   }
 
 }

@@ -30,7 +30,7 @@ package models
  */
 case class Location(
     name: String,
-    geo: String
+    geo: Option[String]
 )
 
 /**
