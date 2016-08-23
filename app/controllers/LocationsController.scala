@@ -29,8 +29,8 @@ import play.api._
 import play.api.mvc._
 import play.api.http.Status._
 import com.github.nscala_time.time.Imports._
-import io.swagger.annotations._
 import javax.inject.Inject
+import io.swagger.annotations._
 import scala.language.postfixOps
 import util._
 import models.Location
@@ -38,34 +38,41 @@ import services.locations.{ LocationAccess, JsonFormat }
 
 // scalastyle:off magic.number
 
-@Api(value = "/locations", description = "Descriptions of MET API locations")
-class LocationsController @Inject()(locationService: LocationAccess) extends Controller {
+@Api(value = "locations")
+class LocationsController @Inject()(locationAccess: LocationAccess) extends Controller {
 
-  /**
-   * GET locations data
-   * @param ids list of ids to retrieve, comma-separated
-   */
   @ApiOperation(
-    nickname = "getLocations",
-    value = "Returns information about the locations of the API",
-    response = classOf[String],
+    value = "Get metada for MET API locations.",
+    notes = "Get metadata for the location names defined in the MET API. Use the query parameters to filter the set of location names returned. Leave the query parameters blank to select **all** location names.",
+    response = classOf[models.LocationResponse],
     httpMethod = "GET")
   @ApiResponses(Array(
-    new ApiResponse(code = 400, message = "An error in the request"),
-    new ApiResponse(code = 404, message = "No data was found")))
+    new ApiResponse(code = 400, message = "Invalid parameter value or malformed request."),
+    new ApiResponse(code = 401, message = "Unauthorized client ID."),
+    new ApiResponse(code = 404, message = "No data was found for the list of query Ids."),
+    new ApiResponse(code = 500, message = "Internal server error.")))
   def getLocations( // scalastyle:ignore public.methods.have.type
-    @ApiParam(value = "If specified, select the location ids listed.", required = false) name: Option[String],
-    @ApiParam(value = "output format", required = true, allowableValues = "jsonld",
-      defaultValue = "jsonld") format: String) = no.met.security.AuthorizedAction {
+    @ApiParam(value = "The MET API location names that you want metadata for. Enter a comma-separated list to select multiple location names.",
+              required = false)
+              names: Option[String],
+    @ApiParam(value = "The output format of the result.",
+              allowableValues = "jsonld",
+              defaultValue = "jsonld",
+              required = true)
+              format: String) = no.met.security.AuthorizedAction {
     implicit request =>
     // Start the clock
     val start = DateTime.now(DateTimeZone.UTC)
     Try  {
-      locationService.getLocations(name)
+      val nameList : Array[String] = names match {
+        case Some(name) => name.toLowerCase.split(",").map(_.trim)
+        case _ => Array()
+      }
+      locationAccess.getLocations(nameList)
     } match {
       case Success(data) =>
         if (data isEmpty) {
-          NotFound("Could not find any data locations for location name " + name)
+          NotFound("Could not find any data locations for location names " + names.getOrElse("<all>"))
         } else {
           format.toLowerCase() match {
             case "jsonld" => Ok(JsonFormat.format(start, data)) as "application/vnd.no.met.data.locations-v0+json"

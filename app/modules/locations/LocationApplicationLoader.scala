@@ -70,7 +70,7 @@ class LocationsApplicationLoader extends GuiceApplicationLoader() {
     context.environment.mode match {
       case Mode.Prod =>
         // start mode
-        builder.bindings(new LocationsDevModule)
+        builder.bindings(new LocationsProdModule)
       case _ =>
         // run mode
         builder.bindings(new LocationsDevModule)

@@ -33,37 +33,38 @@ import anorm._
 import anorm.SqlParser._
 import java.sql.Connection
 import javax.inject.Singleton
-import models.Location
+import models._
 
 //$COVERAGE-OFF$Not testing database queries
+
 @Singleton
 class DbLocationAccess extends LocationAccess("") {
 
   val parser: RowParser[Location] = {
     get[String]("name") ~
-    get[Option[String]]("geo") map {
-      case name~geo => Location(name, geo)
+    get[Option[String]]("feature") ~
+    get[Double]("lon") ~ 
+    get[Double]("lat") map {
+      case name~feature~lon~lat => Location(name, feature, LPoint("Point", Array(lon, lat)))
     }
   }
 
-  def getLocations(name: Option[String]): List[Location] = {
-    val nameList = name map { _.toUpperCase } map { _.replaceAll("\\s+", " ") } map { _.trim } filter { _.length != 0 }
-    //Logger.debug(name.get)
-    //Logger.debug(nameList.toString)
-    val locQ = nameList map (nameStr => {
-      val names = nameStr.split(",").map(_.trim)
-      val qNameList = names.mkString("','")
-      s"UPPER(name) IN ('$qNameList')"
-    } ) getOrElse "TRUE"
+  def getLocations(nameList: Array[String]): List[Location] = {
+
+    val locQ = if (nameList.length > 0) {
+      val names = nameList.mkString("','")
+      s"LOWER(name) IN ('$names')"
+    } else "TRUE"
+    
     val query = s"""
       |SELECT
-        |name, ST_AsText(geo) AS geo
+        |t1.name, t2.name AS feature, ST_X(geo) AS lon, ST_Y(geo) AS lat
       |FROM
-        |locationFeature
+        |locationFeature t1 LEFT OUTER JOIN featureType t2 ON (t1.feature_type = t2.id)
       |WHERE
         |$locQ
       |ORDER BY
-        |name""".stripMargin
+        |t1.name""".stripMargin
 
     Logger.debug(query)
 

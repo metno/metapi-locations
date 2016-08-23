@@ -1,1 +1,5 @@
 Location data is based on Kartverkets stedsnavn database.
+
+The json2sql script included in this directory can be used to convert the geojson file downloaded from kartverket into SQL insert statements as follows: 
+
+  cat stedsnavn.geojson | python json2sql.py > stedsnavn.sql 

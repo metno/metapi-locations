@@ -27,52 +27,72 @@ package services.locations
 
 import play.api.mvc._
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import com.github.nscala_time.time.Imports._
-import models.{ Location, ResponseData }
-import no.met.data.BasicResponseData
+import java.net.URL
+import no.met.data.{ApiConstants,BasicResponseData,ConfigUtil}
 import no.met.data.format.json.BasicJsonFormat
+import models._
+
 
 /**
- * Creating a json representation of locations data
+ * Creating a json representation of elements data
  */
 object JsonFormat extends BasicJsonFormat {
 
-  implicit val locationWriter: Writes[Location] = new Writes[Location] {
+  /* JsValue Writers */
 
-    private def withoutValue(v: JsValue): Boolean = v match {
-      case JsNull => true
-      case JsString("") => true
-      case _ => false
-    }
+  implicit val pointWrites: Writes[LPoint] = (
+    (JsPath \ "@type").write[String] and 
+    (JsPath \ "coordinates").write[Seq[Double]]
+  )(unlift(LPoint.unapply))
 
-    def writes(location: Location): JsObject = {
-      val js = Json.obj(
-        "@type" -> "Location",
-        "name" -> location.name,
-        "geo" -> location.geo)
-      JsObject(js.fields.filterNot(t => withoutValue(t._2)))
-    }
-  }
+  implicit val locationWrites: Writes[Location] = (
+    (JsPath \ "name").write[String] and
+    (JsPath \ "feature").writeNullable[String] and
+    (JsPath \ "geometry").write[LPoint]
+  )(unlift(Location.unapply))
 
-  implicit val responseDataWrites: Writes[ResponseData] = new Writes[ResponseData] {
-    def writes(response: ResponseData): JsObject = {
-      header(response.header) + ("data", Json.toJson(response.data))
-    }
-  }
-
+  implicit val locationResponseWrites: Writes[LocationResponse] = (
+    (JsPath \ ApiConstants.CONTEXT_NAME).write[URL] and 
+    (JsPath \ ApiConstants.OBJECT_TYPE_NAME).write[String] and
+    (JsPath \ ApiConstants.API_VERSION_NAME).write[String] and
+    (JsPath \ ApiConstants.LICENSE_NAME).write[URL] and
+    (JsPath \ ApiConstants.CREATED_AT_NAME).write[DateTime] and
+    (JsPath \ ApiConstants.QUERY_TIME_NAME).write[Duration] and
+    (JsPath \ ApiConstants.CURRENT_ITEM_COUNT_NAME).write[Long] and
+    (JsPath \ ApiConstants.ITEMS_PER_PAGE_NAME).write[Long] and
+    (JsPath \ ApiConstants.OFFSET_NAME).write[Long] and
+    (JsPath \ ApiConstants.TOTAL_ITEM_COUNT_NAME).write[Long] and
+    (JsPath \ ApiConstants.NEXT_LINK_NAME).writeNullable[URL] and
+    (JsPath \ ApiConstants.PREVIOUS_LINK_NAME).writeNullable[URL] and
+    (JsPath \ ApiConstants.CURRENT_LINK_NAME).write[URL] and
+    (JsPath \ ApiConstants.DATA_NAME).write[Seq[Location]]
+  )(unlift(LocationResponse.unapply))
+  
   /**
    * Create json representation of the given list
-   *
    * @param start Start time of the query processing.
    * @param locations The list to create a representation of.
    * @return json representation, as a string
    */
-  def format[A](start: DateTime, locations: Traversable[Location])(implicit request: Request[A]): String = {
+  def format[A](start: DateTime, locations: List[Location])(implicit request: Request[A]): String = {
     val size = locations.size
     val duration = new Duration(DateTime.now.getMillis() - start.getMillis())
-    // Create json representation
-    val header = BasicResponseData("Response", "Locations", "v0", duration, size, size, size, 0, None, None)
-    val response = ResponseData(header, locations)
+    val response = new LocationResponse( new URL(ApiConstants.METAPI_CONTEXT),
+                                       "LocationResponse",
+                                       "v0",
+                                        new URL(ApiConstants.METAPI_LICENSE),
+                                        start,
+                                        duration,
+                                        size,
+                                        size,
+                                        0,
+                                        size,
+                                        None,
+                                        None,
+                                        new URL(ConfigUtil.urlStart + request.uri),
+                                        locations)
     Json.prettyPrint(Json.toJson(response))
   }
 

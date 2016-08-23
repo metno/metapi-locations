@@ -26,8 +26,8 @@
 package services.locations
 
 import javax.inject.Singleton
-import models.Location
 import play.Logger
+import models._
 
 @Singleton
 class MockLocationAccess extends LocationAccess("") {
@@ -35,32 +35,25 @@ class MockLocationAccess extends LocationAccess("") {
   val locations = List[Location](
     new Location(
       "Moen",
-      Some("POINT(8.118306 58.221361)")),
+      None,
+      LPoint("Point", Seq(8.118306, 58.221361))),
     new Location(
-      "Ulsvannet",
-      Some("POINT(8.207000 58.224531)")),
+      "Roa",
+      Some("Small town"),
+      LPoint("Point", Seq(10.6159, 60.2909))),
     new Location(
-      "EmptyPoint",
-      Some("")),
+      "Blindern",
+      Some("Part of a city"),
+      LPoint("Point", Seq(10.7231, 59.9406))),
     new Location(
-      "MissingPoint",
-      None)
+      "Tromsø",
+      Some("City or large town"),
+      LPoint("Point", Seq(18.9551, 69.6489)))
   )
 
-  def getLocations(name: Option[String]): List[Location] = {
-
-    val nameList : Array[String] = name match {
-      case Some(name) => name.toLowerCase.split(",")
-      case _ => Array[String]()
-    }
-
-    if (name.isDefined) {
-      locations filter (loc => nameList.contains(loc.name.toLowerCase) || nameList.length == 0)
-    }
-    else {
-      locations
-    }
-
+  def getLocations(names: Array[String]): List[Location] = {
+    locations.
+      filter (loc => names.contains(loc.name.toLowerCase) || names.length == 0)
   }
 
 
