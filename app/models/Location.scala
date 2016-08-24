@@ -53,12 +53,7 @@ extends BasicResponse( context, responseType, apiVersion, license, createdAt, qu
 
 /** Representation of a MET API Location. */
 case class Location(
-  @(ApiModelProperty @field)(value="The name of the geographic feature.") name: String,
-  @(ApiModelProperty @field)(value="The type of the named geographic feature.") feature: Option[String],
+  @(ApiModelProperty @field)(value="The name of the geographic feature." example="Roa") name: String,
+  @(ApiModelProperty @field)(value="The type of the named geographic feature." example="Small town") feature: Option[String],
   @(ApiModelProperty @field)(value="Spatial location data for the geographic feature.") geometry: Point
-)
-
-case class LPoint(
-  @(ApiModelProperty @field)(name="@type", value="The type of the geometry object", example="Point") geomType: String,
-  @(ApiModelProperty @field)(value="Coordinates of the geometry object", example="59.9423, 10.72") coordinates: Seq[Double]
 )
