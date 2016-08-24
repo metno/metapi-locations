@@ -27,6 +27,7 @@ package services.locations
 
 import javax.inject.Singleton
 import play.Logger
+import no.met.geometry.Point
 import models._
 
 @Singleton
@@ -36,19 +37,19 @@ class MockLocationAccess extends LocationAccess("") {
     new Location(
       "Moen",
       None,
-      LPoint("Point", Seq(8.118306, 58.221361))),
+      Point(coordinates=Seq(8.118306, 58.221361))),
     new Location(
       "Roa",
       Some("Small town"),
-      LPoint("Point", Seq(10.6159, 60.2909))),
+      Point(coordinates=Seq(10.6159, 60.2909))),
     new Location(
       "Blindern",
       Some("Part of a city"),
-      LPoint("Point", Seq(10.7231, 59.9406))),
+      Point(coordinates=Seq(10.7231, 59.9406))),
     new Location(
       "Tromsø",
       Some("City or large town"),
-      LPoint("Point", Seq(18.9551, 69.6489)))
+      Point(coordinates=Seq(18.9551, 69.6489)))
   )
 
   def getLocations(names: Array[String]): List[Location] = {

@@ -33,6 +33,7 @@ import anorm._
 import anorm.SqlParser._
 import java.sql.Connection
 import javax.inject.Singleton
+import no.met.geometry.Point
 import models._
 
 //$COVERAGE-OFF$Not testing database queries
@@ -45,7 +46,7 @@ class DbLocationAccess extends LocationAccess("") {
     get[Option[String]]("feature") ~
     get[Double]("lon") ~ 
     get[Double]("lat") map {
-      case name~feature~lon~lat => Location(name, feature, LPoint("Point", Array(lon, lat)))
+      case name~feature~lon~lat => Location(name, feature, Point("Point", Array(lon, lat)))
     }
   }
 

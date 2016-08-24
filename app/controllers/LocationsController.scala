@@ -75,7 +75,7 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
           NotFound("Could not find any data locations for location names " + names.getOrElse("<all>"))
         } else {
           format.toLowerCase() match {
-            case "jsonld" => Ok(JsonFormat.format(start, data)) as "application/vnd.no.met.data.locations-v0+json"
+            case "jsonld" => Ok(new JsonFormat().format(start, data)) as "application/vnd.no.met.data.locations-v0+json"
             case x        => BadRequest(s"Invalid output format: $x")
           }
         }

@@ -30,28 +30,18 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import com.github.nscala_time.time.Imports._
 import java.net.URL
-import no.met.data.{ApiConstants,BasicResponseData,ConfigUtil}
-import no.met.data.format.json.BasicJsonFormat
+import no.met.data.{ApiConstants, ConfigUtil}
+import no.met.geometry.Point
+import no.met.json.BasicJsonFormat
 import models._
 
 
 /**
  * Creating a json representation of elements data
  */
-object JsonFormat extends BasicJsonFormat {
+class JsonFormat extends BasicJsonFormat {
 
-  /* JsValue Writers */
-
-  implicit val pointWrites: Writes[LPoint] = (
-    (JsPath \ "@type").write[String] and 
-    (JsPath \ "coordinates").write[Seq[Double]]
-  )(unlift(LPoint.unapply))
-
-  implicit val locationWrites: Writes[Location] = (
-    (JsPath \ "name").write[String] and
-    (JsPath \ "feature").writeNullable[String] and
-    (JsPath \ "geometry").write[LPoint]
-  )(unlift(Location.unapply))
+  implicit val locationWrites = Json.writes[Location]
 
   implicit val locationResponseWrites: Writes[LocationResponse] = (
     (JsPath \ ApiConstants.CONTEXT_NAME).write[URL] and 
