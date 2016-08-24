@@ -42,8 +42,8 @@ import models._
 class DbLocationAccess extends LocationAccess("") {
 
   val parser: RowParser[Location] = {
-    get[String]("name") ~
-    get[Option[String]]("feature") ~
+    get[String]("locname") ~
+    get[Option[String]]("featuretype") ~
     get[Double]("lon") ~ 
     get[Double]("lat") map {
       case name~feature~lon~lat => Location(name, feature, Point("Point", Array(lon, lat)))
@@ -59,7 +59,7 @@ class DbLocationAccess extends LocationAccess("") {
     
     val query = s"""
       |SELECT
-        |t1.name AS name, t2.name AS feature, ST_X(geo) AS lon, ST_Y(geo) AS lat
+        |t1.name AS locname, t2.name AS featuretype, ST_X(geo) AS lon, ST_Y(geo) AS lat
       |FROM
         |locationFeature t1 LEFT OUTER JOIN featureType t2 ON (t1.feature_type = t2.id)
       |WHERE
