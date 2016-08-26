@@ -54,7 +54,7 @@ class DbLocationAccess extends LocationAccess("") {
 
     val locQ = if (nameList.length > 0) {
       val names = nameList.mkString("','")
-      s"LOWER(name) IN ('$names')"
+      s"LOWER(t1.name) IN ('$names')"
     } else "TRUE"
     
     val query = s"""
@@ -75,4 +75,3 @@ class DbLocationAccess extends LocationAccess("") {
   }
 
 }
-// $COVERAGE-ON$
