@@ -55,14 +55,14 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
     @ApiParam(value = "The MET API location names that you want metadata for. Enter a comma-separated list to select multiple location names. Leave blank to get all names.",
               required = false)
               names: Option[String],
-    @ApiParam(value = "Get MET API location names by geometry. Geometries are specified as either a POINT or POLYGON using <a href='https://en.wikipedia.org/wiki/Well-known_text'>WKT</a>; see the reference section on the <a href=references.html#geometry_specification>Geometry Specification</a> for documentation and examples.",
+    @ApiParam(value = "Get MET API location names by geometry. Geometries are specified as either a POINT or POLYGON using <a href='https://en.wikipedia.org/wiki/Well-known_text'>WKT</a>; see the reference section on the <a href=reference/index.html#geometry_specification>Geometry Specification</a> for documentation and examples.",
               required = false)
               geometry: Option[String],
     @ApiParam(value = "The output format of the result.",
               allowableValues = "jsonld",
               defaultValue = "jsonld",
               required = true)
-              format: String) = Action {
+              format: String) = no.met.security.AuthorizedAction {
     implicit request =>
     // Start the clock
     val start = DateTime.now(DateTimeZone.UTC)
