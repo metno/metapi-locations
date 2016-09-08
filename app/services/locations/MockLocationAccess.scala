@@ -52,12 +52,9 @@ class MockLocationAccess extends LocationAccess("") {
       Point(coordinates=Seq(18.9551, 69.6489)))
   )
 
-  def getLocations(names: Array[String]): List[Location] = {
+  def getLocations(names: Array[String], geometry: Option[String]): List[Location] = {
     locations.
       filter (loc => names.contains(loc.name.toLowerCase) || names.length == 0)
   }
-
-
-
 
 }

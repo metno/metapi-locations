@@ -52,14 +52,17 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
     new ApiResponse(code = 404, message = "No data was found for the list of query Ids."),
     new ApiResponse(code = 500, message = "Internal server error.")))
   def getLocations( // scalastyle:ignore public.methods.have.type
-    @ApiParam(value = "The MET API location names that you want metadata for. Enter a comma-separated list to select multiple location names.",
+    @ApiParam(value = "The MET API location names that you want metadata for. Enter a comma-separated list to select multiple location names. Leave blank to get all names.",
               required = false)
               names: Option[String],
+    @ApiParam(value = "Get MET API location names by geometry. Geometries are specified as either a POINT or POLYGON using <a href='https://en.wikipedia.org/wiki/Well-known_text'>WKT</a>; see the reference section on the <a href=references.html#geometry_specification>Geometry Specification</a> for documentation and examples.",
+              required = false)
+              geometry: Option[String],
     @ApiParam(value = "The output format of the result.",
               allowableValues = "jsonld",
               defaultValue = "jsonld",
               required = true)
-              format: String) = no.met.security.AuthorizedAction {
+              format: String) = Action {
     implicit request =>
     // Start the clock
     val start = DateTime.now(DateTimeZone.UTC)
@@ -68,7 +71,7 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
         case Some(name) => name.toLowerCase.split(",").map(_.trim)
         case _ => Array()
       }
-      locationAccess.getLocations(nameList)
+      locationAccess.getLocations(nameList, geometry)
     } match {
       case Success(data) =>
         if (data isEmpty) {

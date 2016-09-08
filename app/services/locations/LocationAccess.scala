@@ -33,6 +33,6 @@ import models.Location
  */
 abstract class LocationAccess(val url: String) {
 
-  def getLocations(names: Array[String]) : List[Location]
+  def getLocations(names: Array[String], geometry: Option[String]) : List[Location]
 
 }

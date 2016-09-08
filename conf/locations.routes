@@ -3,4 +3,4 @@
 # ~~~~
 
 # MET API
-GET     /v0.:format                 controllers.LocationsController.getLocations(names: Option[String], format: String)
+GET     /v0.:format                 controllers.LocationsController.getLocations(names: Option[String], geometry: Option[String], format: String)

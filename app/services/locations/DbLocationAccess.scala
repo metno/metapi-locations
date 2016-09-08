@@ -25,7 +25,6 @@
 
 package services.locations
 
-import scala.language.postfixOps
 import play.api.Play.current
 import play.api._
 import play.api.db._
@@ -33,7 +32,8 @@ import anorm._
 import anorm.SqlParser._
 import java.sql.Connection
 import javax.inject.Singleton
-import no.met.geometry.Point
+import scala.language.postfixOps
+import no.met.geometry._
 import models._
 
 //$COVERAGE-OFF$Not testing database queries
@@ -50,22 +50,50 @@ class DbLocationAccess extends LocationAccess("") {
     }
   }
 
-  def getLocations(nameList: Array[String]): List[Location] = {
+  def getLocations(nameList: Array[String], geometry: Option[String]): List[Location] = {
 
-    val locQ = if (nameList.length > 0) {
+    val namQ = if (nameList.length > 0) {
       val names = nameList.mkString("','")
       s"LOWER(t1.name) IN ('$names')"
     } else "TRUE"
-    
-    val query = s"""
+    val query = if (geometry.isEmpty) {
+      s"""
       |SELECT
         |t1.name AS locname, t2.name AS featuretype, ST_X(geo) AS lon, ST_Y(geo) AS lat
       |FROM
         |locationFeature t1 LEFT OUTER JOIN featureType t2 ON (t1.feature_type = t2.id)
       |WHERE
-        |$locQ
+        |$namQ
       |ORDER BY
         |t1.name""".stripMargin
+    }
+    else {
+      val geom = Geometry.decode(geometry.get)
+      if (geom.isInterpolated) {
+        s"""
+        |SELECT
+          |t1.name AS locname, t2.name AS featuretype, ST_X(geo) AS lon, ST_Y(geo) AS lat
+        |FROM
+          |locationFeature t1 LEFT OUTER JOIN featureType t2 ON (t1.feature_type = t2.id)
+        |WHERE
+          |$namQ
+        |ORDER BY
+          | geo <-> ST_GeomFromText('${geom.asWkt}',4326), t1.name
+        |LIMIT 1""".stripMargin
+      }
+      else {
+        s"""
+        |SELECT
+          |t1.name AS locname, t2.name AS featuretype, ST_X(geo) AS lon, ST_Y(geo) AS lat
+        |FROM
+          |locationFeature t1 LEFT OUTER JOIN featureType t2 ON (t1.feature_type = t2.id)
+        |WHERE
+          |$namQ AND
+          |ST_WITHIN(geo, ST_GeomFromText('${geom.asWkt}',4326))
+        |ORDER BY
+          |t1.name""".stripMargin
+      }
+    } 
 
     Logger.debug(query)
 
