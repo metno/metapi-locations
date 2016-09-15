@@ -91,6 +91,16 @@ class ControllersSpec extends Specification {
       status(response) must equalTo(BAD_REQUEST)
     }
 
+    "return a result with the fields parameter specified" in new WithApplication(TestUtil.app) {
+      val response = route(FakeRequest(GET, "/v0.jsonld?names=Moen&fields=geometry")).get
+
+      status(response) must equalTo(OK)
+
+      val json = Json.parse(contentAsString(response))
+      contentType(response) must beSome.which(_ == "application/vnd.no.met.data.locations-v0+json")
+      (json \ "data").as[JsArray].value.size must equalTo(1)
+    }
+
     /*
     "return a result with empty point data" in new WithApplication(TestUtil.app) {
       val response = route(FakeRequest(GET, "/v0.jsonld?names=EmptyPoint")).get
@@ -112,7 +122,7 @@ class ControllersSpec extends Specification {
       (json \ "data").as[JsArray].value.size must equalTo(1)
     }
     */
-    
+
   }
 
 }

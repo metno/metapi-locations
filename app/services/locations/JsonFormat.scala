@@ -44,7 +44,7 @@ class JsonFormat extends BasicJsonFormat {
   implicit val locationWrites = Json.writes[Location]
 
   implicit val locationResponseWrites: Writes[LocationResponse] = (
-    (JsPath \ ApiConstants.CONTEXT_NAME).write[URL] and 
+    (JsPath \ ApiConstants.CONTEXT_NAME).write[URL] and
     (JsPath \ ApiConstants.OBJECT_TYPE_NAME).write[String] and
     (JsPath \ ApiConstants.API_VERSION_NAME).write[String] and
     (JsPath \ ApiConstants.LICENSE_NAME).write[URL] and
@@ -59,7 +59,7 @@ class JsonFormat extends BasicJsonFormat {
     (JsPath \ ApiConstants.CURRENT_LINK_NAME).write[URL] and
     (JsPath \ ApiConstants.DATA_NAME).write[Seq[Location]]
   )(unlift(LocationResponse.unapply))
-  
+
   /**
    * Create json representation of the given list
    * @param start Start time of the query processing.

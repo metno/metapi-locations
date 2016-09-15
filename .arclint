@@ -39,7 +39,8 @@
       "severity": {
         "3": "disabled",
         "5": "advice"
-      }
+      },
+      "exclude": [ "(\\.sql$)" ]
     }
   }
 }

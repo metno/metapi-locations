@@ -48,12 +48,13 @@ case class LocationResponse(
   @(ApiModelProperty @field)(value=ApiConstants.PREVIOUS_LINK, example=ApiConstants.PREVIOUS_LINK_EXAMPLE) previousLink: Option[URL],
   @(ApiModelProperty @field)(value=ApiConstants.CURRENT_LINK, example=ApiConstants.CURRENT_LINK_EXAMPLE) currentLink: URL,
   @(ApiModelProperty @field)(value=ApiConstants.DATA) data: Seq[Location]
-) 
-extends BasicResponse( context, responseType, apiVersion, license, createdAt, queryTime, currentItemCount, itemsPerPage, offset, totalItemCount, nextLink, previousLink, currentLink)
+)
+extends BasicResponse( context, responseType, apiVersion, license, createdAt, queryTime, currentItemCount, itemsPerPage, offset, totalItemCount,
+    nextLink, previousLink, currentLink)
 
 /** Representation of a MET API Location. */
 case class Location(
-  @(ApiModelProperty @field)(value="The name of the geographic feature.", example="Roa") name: String,
+  @(ApiModelProperty @field)(value="The name of the geographic feature.", example="Roa") name: Option[String],
   @(ApiModelProperty @field)(value="The type of the named geographic feature.", example="Small town") feature: Option[String],
-  @(ApiModelProperty @field)(value="Spatial location data for the geographic feature.") geometry: Point
+  @(ApiModelProperty @field)(value="Spatial location data for the geographic feature.") geometry: Option[Point]
 )

@@ -33,6 +33,7 @@ import anorm.SqlParser._
 import java.sql.Connection
 import javax.inject.Singleton
 import scala.language.postfixOps
+import no.met.data.BadRequestException
 import no.met.geometry._
 import models._
 
@@ -42,58 +43,77 @@ import models._
 class DbLocationAccess extends LocationAccess("") {
 
   val parser: RowParser[Location] = {
-    get[String]("locname") ~
-    get[Option[String]]("featuretype") ~
-    get[Double]("lon") ~ 
-    get[Double]("lat") map {
-      case name~feature~lon~lat => Location(name, feature, Point("Point", Array(lon, lat)))
+    get[Option[String]]("name") ~
+    get[Option[String]]("feature") ~
+    get[Option[Double]]("lon") ~
+    get[Option[Double]]("lat") map {
+      case name~feature~lon~lat =>
+        Location(name, feature, if (lon.isEmpty || lat.isEmpty) None else Some(Point("Point", Seq(lon.get, lat.get))))
     }
   }
 
-  def getLocations(nameList: Array[String], geometry: Option[String]): List[Location] = {
+  private def getSelectQuery(fields: Set[String]) : String = {
+    val legalFields = Set("name", "feature", "geometry")
+    val illegalFields = fields -- legalFields
+    if (!illegalFields.isEmpty) throw new BadRequestException("Invalid fields in the query parameter: " + illegalFields.mkString(","))
+    val fieldStr = fields.mkString(", ")
+      .replace("geometry", "lon, lat")
+    val missing = legalFields -- fields
+    if (missing.isEmpty) {
+      fieldStr
+    }
+    else {
+      val missingStr = missing.map( x => "NULL AS " + x ).mkString(", ").replace("NULL AS geometry", "NULL AS lon, NULL AS lat")
+      fieldStr + "," + missingStr
+    }
+  }
 
+  def getLocations(nameList: Array[String], geometry: Option[String], fields: Set[String]): List[Location] = {
+    val selectQ = if (fields.isEmpty) "*" else getSelectQuery(fields)
     val namQ = if (nameList.length > 0) {
       val names = nameList.mkString("','")
-      s"LOWER(t1.name) IN ('$names')"
-    } else "TRUE"
+      s"LOWER(name) IN ('$names')"
+    } else {
+      "TRUE"
+    }
     val query = if (geometry.isEmpty) {
       s"""
       |SELECT
-        |t1.name AS locname, t2.name AS featuretype, ST_X(geo) AS lon, ST_Y(geo) AS lat
+        |$selectQ
       |FROM
-        |locationFeature t1 LEFT OUTER JOIN featureType t2 ON (t1.feature_type = t2.id)
+        |get_locations_v
       |WHERE
         |$namQ
       |ORDER BY
-        |t1.name""".stripMargin
+        |name""".stripMargin
     }
     else {
       val geom = Geometry.decode(geometry.get)
       if (geom.isInterpolated) {
         s"""
         |SELECT
-          |t1.name AS locname, t2.name AS featuretype, ST_X(geo) AS lon, ST_Y(geo) AS lat
+          |$selectQ
         |FROM
-          |locationFeature t1 LEFT OUTER JOIN featureType t2 ON (t1.feature_type = t2.id)
+          |get_locations_v
         |WHERE
           |$namQ
         |ORDER BY
-          | geo <-> ST_GeomFromText('${geom.asWkt}',4326), t1.name
+          | geo <-> ST_GeomFromText('${geom.asWkt}',4326), name
         |LIMIT 1""".stripMargin
       }
       else {
         s"""
         |SELECT
-          |t1.name AS locname, t2.name AS featuretype, ST_X(geo) AS lon, ST_Y(geo) AS lat
+          |$selectQ
         |FROM
-          |locationFeature t1 LEFT OUTER JOIN featureType t2 ON (t1.feature_type = t2.id)
+          |get_locations_v
         |WHERE
           |$namQ AND
           |ST_WITHIN(geo, ST_GeomFromText('${geom.asWkt}',4326))
         |ORDER BY
-          |t1.name""".stripMargin
+          |name""".stripMargin
       }
-    } 
+    }
 
     Logger.debug(query)
 

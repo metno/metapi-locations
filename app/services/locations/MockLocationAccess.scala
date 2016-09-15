@@ -35,26 +35,26 @@ class MockLocationAccess extends LocationAccess("") {
   // Mock Locations
   val locations = List[Location](
     new Location(
-      "Moen",
+      Some("Moen"),
       None,
-      Point(coordinates=Seq(8.118306, 58.221361))),
+      Some(Point(coordinates=Seq(8.118306, 58.221361)))),
     new Location(
-      "Roa",
+      Some("Roa"),
       Some("Small town"),
-      Point(coordinates=Seq(10.6159, 60.2909))),
+      Some(Point(coordinates=Seq(10.6159, 60.2909)))),
     new Location(
-      "Blindern",
+      Some("Blindern"),
       Some("Part of a city"),
-      Point(coordinates=Seq(10.7231, 59.9406))),
+      Some(Point(coordinates=Seq(10.7231, 59.9406)))),
     new Location(
-      "Tromsø",
+      Some("Tromso"),
       Some("City or large town"),
-      Point(coordinates=Seq(18.9551, 69.6489)))
+      Some(Point(coordinates=Seq(18.9551, 69.6489))))
   )
 
-  def getLocations(names: Array[String], geometry: Option[String]): List[Location] = {
+  def getLocations(names: Array[String], geometry: Option[String], fields: Set[String]): List[Location] = {
     locations.
-      filter (loc => names.contains(loc.name.toLowerCase) || names.length == 0)
+      filter (loc => names.contains(loc.name.get.toLowerCase) || names.length == 0)
   }
 
 }

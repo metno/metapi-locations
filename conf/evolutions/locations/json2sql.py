@@ -16,7 +16,7 @@
 #        "enh_snavn":"Stalsbergtjernet",
 #        "enh_komm":604,
 #        "enh_ssrobj_id":58249,
-#        "enh_sntystat":"H",  // Main name (H) or Alias 
+#        "enh_sntystat":"H",  // Main name (H) or Alias
 #        "enh_navntype":32,  // Type of the feature
 #        "for_snavn":"Stalsbergtjernet",
 #        "kom_fylkesnr":6,
@@ -37,7 +37,7 @@ obj=json.load(sys.stdin)
 sys.stdout.write("# --- !Ups\n\n")
 
 for i in range(0, 2500000):
-   if (obj["features"][i]["properties"]["enh_sntystat"] == 'H' and obj["features"][i]["properties"]["enh_snspraak"] == 'NO' and (obj["features"][i]["properties"]["enh_navntype"] == 100 or obj["features"][i]["properties"]["enh_navntype"] == 101 or obj["features"][i]["properties"]["enh_navntype"] == 132) and (obj["features"][i]["properties"]["skr_snskrstat"] == 'G' or obj["features"][i]["properties"]["skr_snskrstat"] == 'S' or obj["features"][i]["properties"]["skr_snskrstat"] == 'V' or obj["features"][i]["properties"]["skr_snskrstat"] == 'P')): 
+   if (obj["features"][i]["properties"]["enh_sntystat"] == 'H' and obj["features"][i]["properties"]["enh_snspraak"] == 'NO' and (obj["features"][i]["properties"]["enh_navntype"] == 100 or obj["features"][i]["properties"]["enh_navntype"] == 101 or obj["features"][i]["properties"]["enh_navntype"] == 132) and (obj["features"][i]["properties"]["skr_snskrstat"] == 'G' or obj["features"][i]["properties"]["skr_snskrstat"] == 'S' or obj["features"][i]["properties"]["skr_snskrstat"] == 'V' or obj["features"][i]["properties"]["skr_snskrstat"] == 'P')):
      sys.stdout.write("INSERT INTO locationFeature VALUES ('")
      sys.stdout.write(obj["features"][i]["properties"]["enh_snavn"].encode('utf-8'))
      sys.stdout.write("', '")
@@ -56,6 +56,6 @@ for i in range(0, 2500000):
      sys.stdout.write('\n')
      sys.stdout.flush
 
-sys.stdout.write("\n# --- !Downs\n\n")   
+sys.stdout.write("\n# --- !Downs\n\n")
 sys.stdout.write("DELETE FROM locationFeature;\n")
 sys.stdout.flush

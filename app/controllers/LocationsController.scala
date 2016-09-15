@@ -37,6 +37,7 @@ import models.Location
 import services.locations.{ LocationAccess, JsonFormat }
 
 // scalastyle:off magic.number
+// scalastyle:off line.size.limit
 
 @Api(value = "locations")
 class LocationsController @Inject()(locationAccess: LocationAccess) extends Controller {
@@ -58,6 +59,9 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
     @ApiParam(value = "Get MET API location names by geometry. Geometries are specified as either a POINT or POLYGON using <a href='https://en.wikipedia.org/wiki/Well-known_text'>WKT</a>; see the reference section on the <a href=reference/index.html#geometry_specification>Geometry Specification</a> for documentation and examples.",
               required = false)
               geometry: Option[String],
+    @ApiParam(value = "A comma-separated list of the fields that should be present in the response. If set, only those properties listed here will be visible in the result set; e.g.: name,geometry will show only those two entries in the data set.",
+              required = false)
+              fields: Option[String],
     @ApiParam(value = "The output format of the result.",
               allowableValues = "jsonld",
               defaultValue = "jsonld",
@@ -71,7 +75,11 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
         case Some(name) => name.toLowerCase.split(",").map(_.trim)
         case _ => Array()
       }
-      locationAccess.getLocations(nameList, geometry)
+      val fieldList : Set[String] = fields match {
+          case Some(x) => x.toLowerCase.split(",").map(_.trim).toSet
+          case _ => Set()
+      }
+      locationAccess.getLocations(nameList, geometry, fieldList)
     } match {
       case Success(data) =>
         if (data isEmpty) {

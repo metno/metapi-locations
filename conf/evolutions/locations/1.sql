@@ -5,7 +5,7 @@ CREATE TABLE locationFeature (
   language TEXT NOT NULL,
   type_status TEXT NOT NULL,
   legal_status TEXT NOT NULL,
-  feature_type INTEGER NOT NULL  
+  feature_type INTEGER NOT NULL
 );
 
 SELECT AddGeometryColumn('public', 'locationfeature', 'geo', 4326, 'GEOMETRY', 2);
