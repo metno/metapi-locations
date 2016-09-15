@@ -33,6 +33,7 @@ import javax.inject.Inject
 import io.swagger.annotations._
 import scala.language.postfixOps
 import util._
+import no.met.data.FieldSpecification
 import models.Location
 import services.locations.{ LocationAccess, JsonFormat }
 
@@ -75,10 +76,7 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
         case Some(name) => name.toLowerCase.split(",").map(_.trim)
         case _ => Array()
       }
-      val fieldList : Set[String] = fields match {
-          case Some(x) => x.toLowerCase.split(",").map(_.trim).toSet
-          case _ => Set()
-      }
+      val fieldList = FieldSpecification.parse(fields)
       locationAccess.getLocations(nameList, geometry, fieldList)
     } match {
       case Success(data) =>
