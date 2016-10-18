@@ -33,12 +33,9 @@ import javax.inject.Inject
 import io.swagger.annotations._
 import scala.language.postfixOps
 import util._
-import no.met.data.FieldSpecification
+import no.met.data._
 import models.Location
 import services.locations.{ LocationAccess, JsonFormat }
-
-// scalastyle:off magic.number
-// scalastyle:off line.size.limit
 
 @Api(value = "locations")
 class LocationsController @Inject()(locationAccess: LocationAccess) extends Controller {
@@ -69,8 +66,7 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
               required = true)
               format: String) = no.met.security.AuthorizedAction {
     implicit request =>
-    // Start the clock
-    val start = DateTime.now(DateTimeZone.UTC)
+    val start = DateTime.now(DateTimeZone.UTC) // start the clock
     Try  {
       val nameList : Array[String] = names match {
         case Some(name) => name.toLowerCase.split(",").map(_.trim)
@@ -81,17 +77,18 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
     } match {
       case Success(data) =>
         if (data isEmpty) {
-          NotFound("Could not find any data locations for location names " + names.getOrElse("<all>"))
+          Error.error(NOT_FOUND, Some("Could not find any data locations for location names " + names.getOrElse("<all>")), None, start)
         } else {
           format.toLowerCase() match {
             case "jsonld" => Ok(new JsonFormat().format(start, data)) as "application/vnd.no.met.data.locations-v0+json"
-            case x        => BadRequest(s"Invalid output format: $x")
+            case x        => Error.error(BAD_REQUEST, Some(s"Invalid output format: $x"), Some("Supported output formats: jsonld"), start)
           }
         }
-      case Failure(x) => BadRequest(x getLocalizedMessage)
+      case Failure(x: BadRequestException) =>
+        Error.error(BAD_REQUEST, Some(x getLocalizedMessage), x help, start)
+      case Failure(x) =>
+        Error.error(BAD_REQUEST, Some(x getLocalizedMessage), None, start)
     }
   }
 
 }
-
-// scalastyle:on
