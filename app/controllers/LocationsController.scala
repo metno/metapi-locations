@@ -68,6 +68,9 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
     implicit request =>
     val start = DateTime.now(DateTimeZone.UTC) // start the clock
     Try  {
+      // ensure that the query string contains supported fields only
+      QueryStringUtil.ensureSubset(Set("names", "geometry", "fields"), request.queryString.keySet)
+
       val nameList : Array[String] = names match {
         case Some(name) => name.toLowerCase.split(",").map(_.trim)
         case _ => Array()

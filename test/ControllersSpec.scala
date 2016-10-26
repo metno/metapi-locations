@@ -78,15 +78,15 @@ class ControllersSpec extends Specification {
       status(response) must equalTo(NOT_FOUND)
     }
 
-    "returns correct contentType for getLocations" in new WithApplication(TestUtil.app) {
-      val response = route(FakeRequest(GET, "/v0.jsonld?id=sum(precipitation_amount%201m)")).get
+    "return correct contentType for getLocations" in new WithApplication(TestUtil.app) {
+      val response = route(FakeRequest(GET, "/v0.jsonld?names=Moen")).get
 
       status(response) must equalTo(OK)
       contentType(response) must beSome.which(_ == "application/vnd.no.met.data.locations-v0+json")
     }
 
     "returns error if format is incorrect" in new WithApplication(TestUtil.app) {
-      val response = route(FakeRequest(GET, "/v0.txt?name=Moen")).get
+      val response = route(FakeRequest(GET, "/v0.txt?names=Moen")).get
 
       status(response) must equalTo(BAD_REQUEST)
     }
@@ -99,6 +99,12 @@ class ControllersSpec extends Specification {
       val json = Json.parse(contentAsString(response))
       contentType(response) must beSome.which(_ == "application/vnd.no.met.data.locations-v0+json")
       (json \ "data").as[JsArray].value.size must equalTo(1)
+    }
+
+    "return error if unsupported fields are specified" in new WithApplication(TestUtil.app) {
+      val response = route(FakeRequest(GET, "/v0.jsonld?foo=bar")).get
+
+      status(response) must equalTo(BAD_REQUEST)
     }
 
     /*
