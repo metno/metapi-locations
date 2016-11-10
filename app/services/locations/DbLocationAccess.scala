@@ -55,7 +55,11 @@ class DbLocationAccess extends LocationAccess("") {
   private def getSelectQuery(fields: Set[String]) : String = {
     val legalFields = Set("name", "feature", "geometry")
     val illegalFields = fields -- legalFields
-    if (!illegalFields.isEmpty) throw new BadRequestException("Invalid fields in the query parameter: " + illegalFields.mkString(","))
+    if (!illegalFields.isEmpty) {
+      throw new BadRequestException(
+        "Invalid fields in the query parameter: " + illegalFields.mkString(","),
+        Some(s"Supported fields: ${legalFields.mkString(", ")}"))
+    }
     val fieldStr = fields.mkString(", ")
       .replace("geometry", "lon, lat")
     val missing = legalFields -- fields
