@@ -42,7 +42,7 @@ import models._
 @Singleton
 class DbLocationAccess extends LocationAccess("") {
 
-  val parser: RowParser[Location] = {
+  private val parser: RowParser[Location] = {
     get[Option[String]]("name") ~
     get[Option[String]]("feature") ~
     get[Option[Double]]("lon") ~
