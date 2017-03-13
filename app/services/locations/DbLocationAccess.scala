@@ -72,14 +72,27 @@ class DbLocationAccess extends LocationAccess("") {
     }
   }
 
-  def getLocations(nameList: Array[String], geometry: Option[String], fields: Set[String]): List[Location] = {
+  // Converts a SQL query to a version where the argument to the IN operator has been replaced by
+  // placeholders to support prepared statements (which in turn serves to prevent SQL injection).
+  private def safeInOpQuery(query: String, key: String, length: Int): String = {
+    val toBeReplaced = "{%s}" format key
+    val newKeys = (1 to length) map ("%s%d" format (key, _))
+    val newKeysWithBraces = newKeys map ("{%s}" format _)
+    val replacement = "(%s)" format (newKeysWithBraces mkString ",")
+    query replace (toBeReplaced, replacement)
+  }
+
+  // Generates the argument to pass to the on() function for a query that has been converted using safeInOpQuery().
+  private def safeInOpOnArg(key: String, values: List[String]): Seq[NamedParameter] = {
+    val keys = (1 to values.length) map ("%s%d" format (key, _))
+    val paramValues: List[ParameterValue] = values map (ParameterValue.toParameterValue(_))
+    keys zip paramValues map { (x) => new NamedParameter(x._1, x._2) }
+  }
+
+  def getLocations(names: Array[String], geometry: Option[String], fields: Set[String]): List[Location] = {
     val selectQ = if (fields.isEmpty) "*" else getSelectQuery(fields)
-    val namQ = if (nameList.length > 0) {
-      val names = nameList.mkString("','")
-      s"LOWER(name) IN ('$names')"
-    } else {
-      "TRUE"
-    }
+    val namesQ = if (names.length > 0) "LOWER(name) IN {names}" else "TRUE"
+
     val query = if (geometry.isEmpty) {
       s"""
       |SELECT
@@ -87,7 +100,7 @@ class DbLocationAccess extends LocationAccess("") {
       |FROM
         |get_locations_v
       |WHERE
-        |$namQ
+        |$namesQ
       |ORDER BY
         |name""".stripMargin
     }
@@ -100,7 +113,7 @@ class DbLocationAccess extends LocationAccess("") {
         |FROM
           |get_locations_v
         |WHERE
-          |$namQ
+          |$namesQ
         |ORDER BY
           | geo <-> ST_GeomFromText('${geom.asWkt}',4326), name
         |LIMIT 1""".stripMargin
@@ -112,7 +125,7 @@ class DbLocationAccess extends LocationAccess("") {
         |FROM
           |get_locations_v
         |WHERE
-          |$namQ AND
+          |$namesQ AND
           |ST_WITHIN(geo, ST_GeomFromText('${geom.asWkt}',4326))
         |ORDER BY
           |name""".stripMargin
@@ -122,7 +135,7 @@ class DbLocationAccess extends LocationAccess("") {
     Logger.debug(query)
 
     DB.withConnection("locations") { implicit connection =>
-      SQL(query).as( parser * )
+      SQL(safeInOpQuery(query, "names", names.length)).on(safeInOpOnArg("names", names.toList): _*).as( parser * )
     }
   }
 
