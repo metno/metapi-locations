@@ -54,7 +54,7 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
     @ApiParam(value = "The MET API location names that you want metadata for. Enter a comma-separated list to select multiple location names. Leave blank to get all names.",
               required = false)
               names: Option[String],
-    @ApiParam(value = "Get MET API location names by geometry. Geometries are specified as either a POINT or POLYGON using <a href='https://en.wikipedia.org/wiki/Well-known_text'>WKT</a>; see the reference section on the <a href=reference/index.html#geometry_specification>Geometry Specification</a> for documentation and examples.",
+    @ApiParam(value = "Get MET API location names by geometry. Geometries are specified as either a POINT or POLYGON using <a href='https://en.wikipedia.org/wiki/Well-known_text'>WKT</a>; see the reference section on the <a href=concepts/index.html#geometry_specification>Geometry Specification</a> for documentation and examples.",
               required = false)
               geometry: Option[String],
     @ApiParam(value = "A comma-separated list of the fields that should be present in the response. If set, only those properties listed here will be visible in the result set; e.g.: name,geometry will show only those two entries in the data set.",
