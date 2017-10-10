@@ -99,7 +99,7 @@ class DbLocationAccess extends LocationAccess("") {
         |WHERE
           |$namesQ
         |ORDER BY
-          | geo <-> ST_GeomFromText('${geom.asWkt}',4326), name
+          | ST_MakePoint(lon, lat)::geography::geometry <-> ST_GeomFromText('${geom.asWkt}',4326), name
         |LIMIT 1""".stripMargin
       }
       else {
@@ -110,7 +110,7 @@ class DbLocationAccess extends LocationAccess("") {
           |get_locations_v
         |WHERE
           |$namesQ AND
-          |ST_WITHIN(geo, ST_GeomFromText('${geom.asWkt}',4326))
+          |ST_WITHIN(ST_MakePoint(lon, lat)::geography::geometry, ST_GeomFromText('${geom.asWkt}',4326))
         |ORDER BY
           |name""".stripMargin
       }
