@@ -80,7 +80,7 @@ class LocationsController @Inject()(locationAccess: LocationAccess) extends Cont
     } match {
       case Success(data) =>
         if (data isEmpty) {
-          Error.error(NOT_FOUND, Some("Could not find any data locations for location names " + names.getOrElse("<all>")), None, start)
+          Error.error(NOT_FOUND, Some("No data found for this combination of query parameters"), None, start)
         } else {
           format.toLowerCase() match {
             case "jsonld" => Ok(new JsonFormat().format(start, data)) as "application/vnd.no.met.data.locations-v0+json"
